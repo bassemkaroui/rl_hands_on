@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "rl-hands-on"
+version = "0.1.0"
+description = ""
+authors = ["Bassem Karoui <bassem.karoui1@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ptan = "^0.8"
+torch = { version = "^2.3.1", source = "pytorch" }
+torchvision = { version = "*", source = "pytorch" }
+torchaudio = { version = "*", source = "pytorch" }
+tensorboard = "^2.17.1"
+tensorboardx = "^2.6.2.2"
+torchrl = "^0.3.0"
+ray = { version = "^2.35.0", extras = ["tune"] }
+gymnasium = { version = "^0.29.1", extras = [
+	"atari",
+	"classic-control",
+	"accept-rom-license",
+] }
+lightning = "^2.4.0"
+seaborn = "^0.13.2"
+argcomplete = "^3.5.0"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.11.2"
+pytest = "^8.3.2"
+ipython = "^8.27.0"
+
+[[tool.poetry.source]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "supplemental"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
