@@ -181,6 +181,8 @@ def main(args=None):
 
     policy, optimizer = fabric.setup(policy, optimizer)
 
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.9)
+
     writer = SummaryWriter(comment=f"-{args.env_name.split('-')[0].lower()}")
 
     for iter_num, batch in enumerate(
@@ -196,6 +198,7 @@ def main(args=None):
             loss = F.cross_entropy(action_logits_vec, act_vec)
         fabric.backward(loss)
         optimizer.step()
+        scheduler.step()
         logger.info(
             f"{iter_num}: {loss=:.3f}, {rewards_mean=:.1f}, {reward_bound=:.1f}"
         )
