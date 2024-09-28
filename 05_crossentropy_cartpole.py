@@ -198,9 +198,11 @@ def main(args=None):
             loss = F.cross_entropy(action_logits_vec, act_vec)
         fabric.backward(loss)
         optimizer.step()
+        lr = scheduler.get_last_lr()[0]
+        writer.add_scalar("lr", lr, iter_num)
         scheduler.step()
         logger.info(
-            f"{iter_num}: {loss=:.3f}, {rewards_mean=:.1f}, {reward_bound=:.1f}"
+            f"{iter_num}: {lr=:.2e}, {loss=:.3f}, {rewards_mean=:.1f}, {reward_bound=:.1f}"
         )
         writer.add_scalar("loss", loss.item(), iter_num)
         writer.add_scalar("reward_mean", rewards_mean, iter_num)
