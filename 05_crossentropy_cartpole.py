@@ -11,6 +11,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.tensorboard import SummaryWriter
 
 HIDDEN_SIZE = 128
 BATCH_SIZE = 16
@@ -180,13 +181,13 @@ def main(args=None):
 
     policy, optimizer = fabric.setup(policy, optimizer)
 
-    writer = torch.utils.tensorboard.SummaryWriter(
-        comment=f"-{args.env_name.split('-')[0].lower()}"
-    )
+    writer = SummaryWriter(comment=f"-{args.env_name.split('-')[0].lower()}")
 
-    for iter_num, batch in enumerate(iterate_batches(env, policy, args.batch_size)):
+    for iter_num, batch in enumerate(
+        iterate_batches(fabric, env, policy, args.batch_size)
+    ):
         obs_vec, act_vec, rewards_mean, reward_bound = filter_batch(
-            batch, args.percentile
+            fabric, batch, args.percentile
         )
         policy.train()
         optimizer.zero_grad()
@@ -198,7 +199,7 @@ def main(args=None):
         logger.info(
             f"{iter_num}: {loss=:.3f}, {rewards_mean=:.1f}, {reward_bound=:.1f}"
         )
-        writer.add_scaler("loss", loss.item(), iter_num)
+        writer.add_scalar("loss", loss.item(), iter_num)
         writer.add_scalar("reward_mean", rewards_mean, iter_num)
         writer.add_scalar("reward_bound", reward_bound, iter_num)
         if rewards_mean >= env.spec.reward_threshold:
