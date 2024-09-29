@@ -141,6 +141,7 @@ def main(args=None):
         description="Cross-entropy method on Cartpole-v1",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+    parser.add_argument("--record", action="store_true")
     parser.add_argument("--hidden-size", type=pos_int, default=HIDDEN_SIZE)
     parser.add_argument("--batch-size", type=pos_int, default=BATCH_SIZE)
     parser.add_argument("--percentile", type=percentile_type, default=PERCENTILE)
@@ -211,6 +212,27 @@ def main(args=None):
             logger.info("Solved!")
             break
     writer.close()
+
+    if args.record:
+        env = gym.wrappers.RecordVideo(
+            gym.make(args.env_name, render_mode="rgb_array"), video_folder="video"
+        )
+        total_rewards = 0.0
+        obs, _ = env.reset()
+
+        while True:
+            with torch.no_grad():
+                obs_vec = torch.tensor(obs)
+                fabric.to_device(obs_vec)
+                action_vec = policy(obs_vec.unsqueeze(0))
+                action = action_vec[0].argmax(dim=-1).cpu().item()
+            obs, reward, is_done, is_trunc, _ = env.step(action)
+            total_rewards += reward
+            if is_done or is_trunc:
+                logger.info(
+                    f"Recorded episode finished with total reward of {total_rewards}"
+                )
+                break
 
 
 if __name__ == "__main__":
