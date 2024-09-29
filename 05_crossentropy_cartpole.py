@@ -233,6 +233,7 @@ def main(args=None):
                     f"Recorded episode finished with total reward of {total_rewards}"
                 )
                 break
+        env.close()
 
 
 if __name__ == "__main__":
